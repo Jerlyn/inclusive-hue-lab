@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Palette Studio - Build Inclusive Brand Experiences</title>
+    <meta name="description" content="Professional color palette studio with real-time WCAG compliance checking, color blindness simulation, and intelligent recommendations for inclusive design.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/chroma-js@3.1.2/dist/chroma.min.js"></script>
+    
+    <style>
+        :root {
+            /* Base colors for clean, professional interface */
+            --background: 220 15% 97%;
+            --foreground: 220 25% 15%;
+            --card: 0 0% 100%;
+            --card-foreground: 220 25% 15%;
+            --primary: 250 100% 60%;
+            --primary-foreground: 0 0% 100%;
+            --primary-glow: 250 100% 70%;
+            --secondary: 220 15% 95%;
+            --secondary-foreground: 220 25% 25%;
+            --muted: 220 15% 92%;
+            --muted-foreground: 220 15% 45%;
+            --accent: 280 100% 65%;
+            --accent-foreground: 0 0% 100%;
+            --destructive: 0 75% 55%;
+            --destructive-foreground: 0 0% 100%;
+            --success: 120 65% 45%;
+            --success-foreground: 0 0% 100%;
+            --warning: 45 95% 55%;
+            --warning-foreground: 220 25% 15%;
+            --border: 220 15% 88%;
+            --input: 220 15% 88%;
+            --ring: 250 100% 60%;
+            --radius: 0.75rem;
+            --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+            --gradient-subtle: linear-gradient(180deg, hsl(var(--background)), hsl(var(--muted)));
+            --shadow-soft: 0 4px 20px -4px hsl(var(--primary) / 0.1);
+            --shadow-card: 0 8px 32px -8px hsl(220 25% 15% / 0.1);
+            --shadow-glow: 0 0 40px hsl(var(--primary) / 0.2);
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--gradient-subtle);
+            color: hsl(var(--foreground));
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .card {
+            background: hsl(var(--card));
+            border: 1px solid hsl(var(--border));
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-card);
+            padding: 1.5rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: calc(var(--radius) - 2px);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: hsl(var(--primary));
+            color: hsl(var(--primary-foreground));
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: hsl(var(--foreground));
+            border: 1px solid hsl(var(--border));
+        }
+
+        .btn-outline:hover {
+            background: hsl(var(--secondary));
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: hsl(var(--foreground));
+        }
+
+        .btn-ghost:hover {
+            background: hsl(var(--secondary));
+        }
+
+        .btn-destructive {
+            background: hsl(var(--destructive));
+            color: hsl(var(--destructive-foreground));
+        }
+
+        .input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid hsl(var(--border));
+            border-radius: calc(var(--radius) - 4px);
+            background: hsl(var(--background));
+            color: hsl(var(--foreground));
+            font-size: 0.875rem;
+        }
+
+        .input:focus {
+            outline: none;
+            border-color: hsl(var(--ring));
+            box-shadow: 0 0 0 2px hsl(var(--ring) / 0.2);
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.125rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .badge-secondary {
+            background: hsl(var(--secondary));
+            color: hsl(var(--secondary-foreground));
+        }
+
+        .badge-outline {
+            background: transparent;
+            border: 1px solid hsl(var(--border));
+            color: hsl(var(--foreground));
+        }
+
+        .badge-success {
+            background: hsl(var(--success));
+            color: hsl(var(--success-foreground));
+        }
+
+        .badge-warning {
+            background: hsl(var(--warning));
+            color: hsl(var(--warning-foreground));
+        }
+
+        .badge-destructive {
+            background: hsl(var(--destructive));
+            color: hsl(var(--destructive-foreground));
+        }
+
+        .grid {
+            display: grid;
+        }
+
+        .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+        .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+        @media (min-width: 1024px) {
+            .lg\\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        }
+
+        .gap-2 { gap: 0.5rem; }
+        .gap-3 { gap: 0.75rem; }
+        .gap-4 { gap: 1rem; }
+        .gap-6 { gap: 1.5rem; }
+
+        .space-y-2 > * + * { margin-top: 0.5rem; }
+        .space-y-3 > * + * { margin-top: 0.75rem; }
+        .space-y-4 > * + * { margin-top: 1rem; }
+        .space-y-6 > * + * { margin-top: 1.5rem; }
+
+        .flex { display: flex; }
+        .items-center { align-items: center; }
+        .items-start { align-items: flex-start; }
+        .justify-center { justify-content: center; }
+        .justify-between { justify-content: space-between; }
+
+        .text-center { text-align: center; }
+        .text-sm { font-size: 0.875rem; }
+        .text-xs { font-size: 0.75rem; }
+        .text-lg { font-size: 1.125rem; }
+        .text-4xl { font-size: 2.25rem; }
+
+        .font-medium { font-weight: 500; }
+        .font-semibold { font-weight: 600; }
+        .font-bold { font-weight: 700; }
+        .font-mono { font-family: monospace; }
+
+        .text-muted-foreground { color: hsl(var(--muted-foreground)); }
+        .text-primary { color: hsl(var(--primary)); }
+
+        .bg-muted { background: hsl(var(--muted)); }
+        .bg-card { background: hsl(var(--card)); }
+        .bg-gradient-primary { background: var(--gradient-primary); }
+
+        .rounded { border-radius: calc(var(--radius) - 4px); }
+        .rounded-lg { border-radius: var(--radius); }
+        .rounded-xl { border-radius: calc(var(--radius) + 4px); }
+
+        .border { border: 1px solid hsl(var(--border)); }
+        .border-2 { border: 2px solid hsl(var(--border)); }
+
+        .p-1 { padding: 0.25rem; }
+        .p-2 { padding: 0.5rem; }
+        .p-3 { padding: 0.75rem; }
+        .p-4 { padding: 1rem; }
+        .p-6 { padding: 1.5rem; }
+
+        .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+        .py-8 { padding-top: 2rem; padding-bottom: 2rem; }
+        .px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+        .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+        .px-4 { padding-left: 1rem; padding-right: 1rem; }
+
+        .mt-1 { margin-top: 0.25rem; }
+        .mt-2 { margin-top: 0.5rem; }
+        .mb-2 { margin-top: 0.5rem; }
+        .mb-3 { margin-bottom: 0.75rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mb-8 { margin-bottom: 2rem; }
+        .ml-2 { margin-left: 0.5rem; }
+        .ml-auto { margin-left: auto; }
+
+        .w-4 { width: 1rem; }
+        .w-5 { width: 1.25rem; }
+        .w-8 { width: 2rem; }
+        .w-16 { width: 4rem; }
+        .w-full { width: 100%; }
+
+        .h-4 { height: 1rem; }
+        .h-5 { height: 1.25rem; }
+        .h-8 { height: 2rem; }
+        .h-10 { height: 2.5rem; }
+        .h-12 { height: 3rem; }
+        .h-16 { height: 4rem; }
+        .h-32 { height: 8rem; }
+
+        .max-w-2xl { max-width: 42rem; }
+        .max-w-7xl { max-width: 80rem; }
+        .max-h-48 { max-height: 12rem; }
+
+        .mx-auto { margin-left: auto; margin-right: auto; }
+
+        .overflow-hidden { overflow: hidden; }
+        .overflow-y-auto { overflow-y: auto; }
+
+        .relative { position: relative; }
+        .absolute { position: absolute; }
+        .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+        .top-2 { top: 0.5rem; }
+        .right-2 { right: 0.5rem; }
+
+        .opacity-0 { opacity: 0; }
+        .opacity-50 { opacity: 0.5; }
+
+        .transition-all { transition: all 0.3s; }
+        .transition-opacity { transition: opacity 0.3s; }
+        .duration-200 { transition-duration: 200ms; }
+        .duration-300 { transition-duration: 300ms; }
+
+        .cursor-pointer { cursor: pointer; }
+
+        .group:hover .group-hover\\:opacity-100 { opacity: 1; }
+
+        .bg-clip-text {
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
+        .text-transparent {
+            color: transparent;
+        }
+
+        .shadow-soft { box-shadow: var(--shadow-soft); }
+        .shadow-card { box-shadow: var(--shadow-card); }
+        .shadow-glow { box-shadow: var(--shadow-glow); }
+
+        .select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+        }
+
+        .tab-list {
+            display: flex;
+            background: hsl(var(--muted));
+            border-radius: calc(var(--radius) - 2px);
+            padding: 0.25rem;
+        }
+
+        .tab-trigger {
+            flex: 1;
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            border-radius: calc(var(--radius) - 4px);
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .tab-trigger.active {
+            background: hsl(var(--background));
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .tab-content {
+            padding-top: 1rem;
+        }
+
+        .hidden { display: none; }
+
+        /* Icons */
+        .icon {
+            width: 1rem;
+            height: 1rem;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .icon-lg {
+            width: 2rem;
+            height: 2rem;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 1024px) {
+            .lg\\:grid-cols-3 {
+                grid-template-columns: 1fr;
+            }
+            .container {
+                padding: 1rem 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="flex items-center justify-center gap-3 mb-4">
+                <div class="p-3 bg-gradient-primary rounded-xl shadow-glow">
+                    <svg class="icon-lg text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M12 2v20m10-10H2"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                </div>
+                <h1 class="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                    Color Palette Studio
+                </h1>
+            </div>
+            <p class="text-muted-foreground text-lg max-w-2xl mx-auto">
+                Build inclusive brand experiences with real-time WCAG compliance checking, 
+                color blindness simulation, and intelligent palette recommendations.
+            </p>
+        </div>
+
+        <!-- Main Content -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left Column - Color Picker & Tools -->
+            <div class="space-y-6">
+                <!-- Color Picker -->
+                <div class="card">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                        <svg class="icon text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="m9.06 11.9 8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08"/>
+                            <path d="m7.07 14.94-1.13 1.13a3 3 0 1 1-4.24-4.24l1.13-1.13"/>
+                            <path d="m12 15 4-4"/>
+                        </svg>
+                        Color Picker
+                    </h3>
+                    <div id="color-picker"></div>
+                </div>
+
+                <!-- Accessibility Tools -->
+                <div class="card">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                        <svg class="icon text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                        Accessibility Tools
+                    </h3>
+                    <div class="tab-list">
+                        <button class="tab-trigger active" onclick="switchTab('wcag')">WCAG</button>
+                        <button class="tab-trigger" onclick="switchTab('colorblind')">Color Blind</button>
+                    </div>
+                    <div class="tab-content">
+                        <div id="wcag-tab" class="tab-pane"></div>
+                        <div id="colorblind-tab" class="tab-pane hidden"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Middle Column - Palette Builder -->
+            <div class="space-y-6">
+                <!-- Palette Builder -->
+                <div class="card">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold">Palette Builder</h3>
+                        <button class="btn btn-outline btn-sm" onclick="exportPalette()">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7,10 12,15 17,10"/>
+                                <line x1="12" x2="12" y1="15" y2="3"/>
+                            </svg>
+                            Export
+                        </button>
+                    </div>
+                    <div id="palette-builder"></div>
+                </div>
+
+                <!-- Smart Recommendations -->
+                <div class="card">
+                    <h3 class="text-lg font-semibold mb-4">Smart Recommendations</h3>
+                    <div id="recommendations"></div>
+                </div>
+            </div>
+
+            <!-- Right Column - Live Preview -->
+            <div>
+                <div class="card h-full">
+                    <h3 class="text-lg font-semibold mb-4">Live Preview</h3>
+                    <div id="live-preview"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let selectedColor = '#6366f1';
+        let palette = [
+            { id: '1', hex: '#6366f1', name: 'Primary' },
+            { id: '2', hex: '#8b5cf6', name: 'Secondary' },
+            { id: '3', hex: '#06b6d4', name: 'Accent' }
+        ];
+        let colorBlindnessType = 'none';
+        let currentTab = 'wcag';
+
+        // Utility functions
+        function getContrastRatio(color1, color2) {
+            try {
+                return chroma.contrast(color1, color2);
+            } catch {
+                return 1;
+            }
+        }
+
+        function getTextColor(backgroundColor) {
+            try {
+                const contrast = chroma.contrast(backgroundColor, '#ffffff');
+                return contrast > 4.5 ? '#ffffff' : '#000000';
+            } catch {
+                return '#000000';
+            }
+        }
+
+        function getWCAGLevel(ratio, largeText = false) {
+            if (largeText) {
+                if (ratio >= 4.5) return 'AAA';
+                if (ratio >= 3) return 'AA';
+                return 'Fail';
+            } else {
+                if (ratio >= 7) return 'AAA';
+                if (ratio >= 4.5) return 'AA';
+                return 'Fail';
+            }
+        }
+
+        function getWCAGColor(level) {
+            switch (level) {
+                case 'AAA': return 'badge-success';
+                case 'AA': return 'badge-warning';
+                default: return 'badge-destructive';
+            }
+        }
+
+        function simulateColorBlindness(hex, simulationType) {
+            if (simulationType === 'none') return hex;
+            
+            try {
+                const color = chroma(hex);
+                const [r, g, b] = color.rgb();
+
+                switch (simulationType) {
+                    case 'protanopia':
+                        return chroma.rgb(
+                            0.567 * r + 0.433 * g,
+                            0.558 * r + 0.442 * g,
+                            0.242 * g + 0.758 * b
+                        ).hex();
+                    case 'deuteranopia':
+                        return chroma.rgb(
+                            0.625 * r + 0.375 * g,
+                            0.7 * r + 0.3 * g,
+                            0.3 * g + 0.7 * b
+                        ).hex();
+                    case 'tritanopia':
+                        return chroma.rgb(
+                            0.95 * r + 0.05 * g,
+                            0.433 * g + 0.567 * b,
+                            0.475 * g + 0.525 * b
+                        ).hex();
+                    default:
+                        return hex;
+                }
+            } catch {
+                return hex;
+            }
+        }
+
+        // Tab switching
+        function switchTab(tabName) {
+            currentTab = tabName;
+            document.querySelectorAll('.tab-trigger').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.add('hidden'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName + '-tab').classList.remove('hidden');
+            
+            if (tabName === 'wcag') {
+                renderWCAGChecker();
+            } else {
+                renderColorBlindnessSimulator();
+            }
+        }
+
+        // Color picker
+        function renderColorPicker() {
+            const container = document.getElementById('color-picker');
+            
+            const colorInfo = (() => {
+                try {
+                    const chromaColor = chroma(selectedColor);
+                    return {
+                        hex: chromaColor.hex(),
+                        rgb: chromaColor.rgb(),
+                        hsl: chromaColor.hsl(),
+                        luminance: chromaColor.luminance(),
+                    };
+                } catch {
+                    return null;
+                }
+            })();
+            
+            container.innerHTML = `
+                <div class="space-y-4">
+                    <!-- Color Display -->
+                    <div class="relative">
+                        <div class="w-full h-32 rounded-lg border-2 border transition-all duration-300" 
+                             style="background-color: ${selectedColor}"></div>
+                        <div class="absolute inset-0 rounded-lg bg-gradient-to-br from-transparent via-transparent to-black/10"></div>
+                    </div>
+
+                    <!-- Color Input -->
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium">Color Value</label>
+                        <div class="flex gap-2">
+                            <input type="color" value="${selectedColor}" 
+                                   onchange="updateColor(this.value)" 
+                                   class="w-16 h-10 p-1 border rounded">
+                            <input type="text" value="${selectedColor}" 
+                                   onchange="updateColor(this.value)" 
+                                   placeholder="#000000 or rgb(0,0,0)"
+                                   class="input flex-1">
+                        </div>
+                    </div>
+
+                    <!-- Color Information -->
+                    ${colorInfo ? `
+                        <div class="bg-muted rounded-lg p-4 space-y-2 text-sm">
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <span class="text-muted-foreground">HEX:</span>
+                                    <span class="ml-2 font-mono">${colorInfo.hex}</span>
+                                </div>
+                                <div>
+                                    <span class="text-muted-foreground">RGB:</span>
+                                    <span class="ml-2 font-mono">
+                                        ${colorInfo.rgb.map(v => Math.round(v)).join(', ')}
+                                    </span>
+                                </div>
+                                <div>
+                                    <span class="text-muted-foreground">HSL:</span>
+                                    <span class="ml-2 font-mono">
+                                        ${Math.round(colorInfo.hsl[0] || 0)}°, ${Math.round(colorInfo.hsl[1] * 100)}%, ${Math.round(colorInfo.hsl[2] * 100)}%
+                                    </span>
+                                </div>
+                                <div>
+                                    <span class="text-muted-foreground">Luminance:</span>
+                                    <span class="ml-2 font-mono">${colorInfo.luminance.toFixed(3)}</span>
+                                </div>
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <!-- Add to Palette Button -->
+                    <button onclick="addColorToPalette()" class="btn btn-outline w-full">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M8 12h8m-4-4v8"/>
+                        </svg>
+                        Add to Palette
+                    </button>
+
+                    <!-- Quick Color Suggestions -->
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium">Quick Adjustments</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button onclick="adjustColor('brighten')" class="btn btn-outline btn-sm text-xs">
+                                Brighter
+                            </button>
+                            <button onclick="adjustColor('darken')" class="btn btn-outline btn-sm text-xs">
+                                Darker
+                            </button>
+                            <button onclick="adjustColor('saturate')" class="btn btn-outline btn-sm text-xs">
+                                Saturate
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateColor(color) {
+            try {
+                selectedColor = chroma(color).hex();
+                renderAll();
+            } catch {
+                // Invalid color, don't update
+            }
+        }
+
+        function adjustColor(type) {
+            try {
+                let newColor;
+                switch (type) {
+                    case 'brighten':
+                        newColor = chroma(selectedColor).brighten(0.5).hex();
+                        break;
+                    case 'darken':
+                        newColor = chroma(selectedColor).darken(0.5).hex();
+                        break;
+                    case 'saturate':
+                        newColor = chroma(selectedColor).saturate(0.5).hex();
+                        break;
+                }
+                selectedColor = newColor;
+                renderAll();
+            } catch {
+                // Error adjusting color
+            }
+        }
+
+        function addColorToPalette() {
+            const newColor = {
+                id: Date.now().toString(),
+                hex: selectedColor,
+                name: `Color ${palette.length + 1}`
+            };
+            palette.push(newColor);
+            renderAll();
+        }
+
+        // WCAG Checker
+        function renderWCAGChecker() {
+            const container = document.getElementById('wcag-tab');
+            
+            const commonBackgrounds = [
+                { name: 'White', color: '#ffffff' },
+                { name: 'Black', color: '#000000' },
+                { name: 'Light Gray', color: '#f8f9fa' },
+                { name: 'Dark Gray', color: '#212529' }
+            ];
+
+            let html = `
+                <div class="space-y-4">
+                    <!-- Info -->
+                    <div class="flex items-start gap-2 p-3 bg-muted rounded-lg">
+                        <svg class="icon text-primary mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 16v-4m0-4h.01"/>
+                        </svg>
+                        <div class="text-sm">
+                            <p class="font-medium">WCAG Contrast Guidelines</p>
+                            <p class="text-muted-foreground text-xs mt-1">
+                                AA: 4.5:1 (normal), 3:1 (large) • AAA: 7:1 (normal), 4.5:1 (large)
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Selected Color vs Common Backgrounds -->
+                    <div>
+                        <h4 class="text-sm font-medium mb-3">Selected Color vs Common Backgrounds</h4>
+                        <div class="space-y-2">
+            `;
+
+            commonBackgrounds.forEach(bg => {
+                const ratio = getContrastRatio(selectedColor, bg.color);
+                const normalLevel = getWCAGLevel(ratio, false);
+                const largeLevel = getWCAGLevel(ratio, true);
+
+                html += `
+                    <div class="flex items-center justify-between p-2 border rounded">
+                        <div class="flex items-center gap-2">
+                            <div class="w-4 h-4 rounded border" style="background-color: ${bg.color}"></div>
+                            <span class="text-sm">${bg.name}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-muted-foreground">${ratio.toFixed(1)}:1</span>
+                            <div class="flex gap-1">
+                                <span class="badge ${getWCAGColor(normalLevel)}">${normalLevel}</span>
+                                <span class="badge ${getWCAGColor(largeLevel)}">${largeLevel} L</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += '</div></div>';
+
+            // Palette Color Combinations
+            if (palette.length > 1) {
+                html += `
+                    <div>
+                        <h4 class="text-sm font-medium mb-3">Palette Color Combinations</h4>
+                        <div class="space-y-2 max-h-48 overflow-y-auto">
+                `;
+
+                for (let i = 0; i < palette.length; i++) {
+                    for (let j = i + 1; j < palette.length; j++) {
+                        const color1 = palette[i];
+                        const color2 = palette[j];
+                        const ratio = getContrastRatio(color1.hex, color2.hex);
+                        const normalLevel = getWCAGLevel(ratio, false);
+                        const largeLevel = getWCAGLevel(ratio, true);
+
+                        html += `
+                            <div class="flex items-center justify-between p-2 border rounded">
+                                <div class="flex items-center gap-2">
+                                    <div class="flex">
+                                        <div class="w-4 h-4 rounded-l border" style="background-color: ${color1.hex}"></div>
+                                        <div class="w-4 h-4 rounded-r border" style="background-color: ${color2.hex}"></div>
+                                    </div>
+                                    <span class="text-sm">${color1.name} + ${color2.name}</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs text-muted-foreground">${ratio.toFixed(1)}:1</span>
+                                    <div class="flex gap-1">
+                                        <span class="badge ${getWCAGColor(normalLevel)}">${normalLevel}</span>
+                                        <span class="badge ${getWCAGColor(largeLevel)}">${largeLevel} L</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+
+                html += '</div></div>';
+            }
+
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // Color Blindness Simulator
+        function renderColorBlindnessSimulator() {
+            const container = document.getElementById('colorblind-tab');
+            
+            const colorBlindnessTypes = [
+                { value: 'none', label: 'Normal Vision' },
+                { value: 'protanopia', label: 'Protanopia (Red-blind)', description: '~1% of males' },
+                { value: 'deuteranopia', label: 'Deuteranopia (Green-blind)', description: '~1% of males' },
+                { value: 'tritanopia', label: 'Tritanopia (Blue-blind)', description: '~0.001% of population' }
+            ];
+
+            const selectedType = colorBlindnessTypes.find(t => t.value === colorBlindnessType);
+
+            let html = `
+                <div class="space-y-4">
+                    <!-- Type Selector -->
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium">Simulation Type</label>
+                        <select onchange="updateColorBlindnessType(this.value)" class="input select">
+            `;
+
+            colorBlindnessTypes.forEach(type => {
+                html += `
+                    <option value="${type.value}" ${type.value === colorBlindnessType ? 'selected' : ''}>
+                        ${type.label}${type.description ? ` - ${type.description}` : ''}
+                    </option>
+                `;
+            });
+
+            html += `
+                        </select>
+                    </div>
+
+                    <!-- Info -->
+                    ${colorBlindnessType !== 'none' ? `
+                        <div class="flex items-start gap-2 p-3 bg-muted rounded-lg">
+                            <svg class="icon text-primary mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M12 16v-4m0-4h.01"/>
+                            </svg>
+                            <div class="text-sm">
+                                <p class="font-medium">${selectedType.label}</p>
+                                <p class="text-muted-foreground text-xs mt-1">
+                                    ${selectedType.description} - See how your palette appears to users with this type of color vision.
+                                </p>
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <!-- Color Simulation -->
+                    <div class="space-y-3">
+                        <h4 class="text-sm font-medium flex items-center gap-2">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                            Color Simulation
+                        </h4>
+            `;
+
+            if (palette.length === 0) {
+                html += `
+                    <p class="text-sm text-muted-foreground text-center py-4">
+                        Add colors to your palette to see the simulation
+                    </p>
+                `;
+            } else {
+                html += '<div class="grid grid-cols-1 gap-2">';
+                
+                palette.forEach(color => {
+                    const simulatedColor = simulateColorBlindness(color.hex, colorBlindnessType);
+                    const isDifferent = simulatedColor !== color.hex;
+
+                    html += `
+                        <div class="flex items-center gap-3 p-2 border rounded">
+                            <!-- Original Color -->
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded border" style="background-color: ${color.hex}"></div>
+                                <div>
+                                    <p class="text-sm font-medium">Original</p>
+                                    <p class="text-xs text-muted-foreground">${color.hex}</p>
+                                </div>
+                            </div>
+
+                            <!-- Arrow -->
+                            <div class="text-muted-foreground">→</div>
+
+                            <!-- Simulated Color -->
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded border" style="background-color: ${simulatedColor}"></div>
+                                <div>
+                                    <p class="text-sm font-medium">Simulated</p>
+                                    <p class="text-xs text-muted-foreground">${simulatedColor}</p>
+                                </div>
+                            </div>
+
+                            <!-- Change Indicator -->
+                            <div class="ml-auto">
+                                <span class="badge ${isDifferent ? 'badge-secondary' : 'badge-outline'}">
+                                    ${isDifferent ? 'Different' : 'Same'}
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += '</div>';
+            }
+
+            html += `
+                    </div>
+
+                    <!-- Tips -->
+                    ${colorBlindnessType !== 'none' && palette.length > 0 ? `
+                        <div style="background: hsl(var(--primary) / 0.05); border: 1px solid hsl(var(--primary) / 0.2);" class="rounded-lg p-3">
+                            <h5 class="text-sm font-medium text-primary mb-1">Accessibility Tips</h5>
+                            <ul class="text-xs text-muted-foreground space-y-1">
+                                <li>• Use patterns, shapes, or text labels in addition to color</li>
+                                <li>• Ensure sufficient contrast between colors</li>
+                                <li>• Test your design with multiple color vision types</li>
+                                <li>• Consider using color-blind friendly palettes</li>
+                            </ul>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function updateColorBlindnessType(type) {
+            colorBlindnessType = type;
+            renderColorBlindnessSimulator();
+            renderLivePreview();
+        }
+
+        // Palette Builder
+        function renderPaletteBuilder() {
+            const container = document.getElementById('palette-builder');
+            
+            if (palette.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-muted-foreground">
+                        <p>No colors in your palette yet.</p>
+                        <p class="text-sm mt-1">Use the color picker to add colors!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `
+                <div class="space-y-4">
+                    <!-- Palette Grid -->
+                    <div class="grid grid-cols-1 gap-3">
+            `;
+
+            palette.forEach(color => {
+                const isSelected = selectedColor === color.hex;
+                const textColor = getTextColor(color.hex);
+                const contrastRatio = getContrastRatio(color.hex, '#ffffff');
+                
+                html += `
+                    <div class="group relative rounded-lg border-2 transition-all duration-200 cursor-pointer hover:shadow-soft ${isSelected ? 'border-primary' : 'border'}" 
+                         onclick="selectColor('${color.hex}')" style="border-color: ${isSelected ? 'hsl(var(--primary))' : 'hsl(var(--border))'}">
+                        <div class="h-16 rounded-t-md flex items-center justify-center relative overflow-hidden"
+                             style="background-color: ${color.hex}">
+                            <!-- Color value overlay -->
+                            <span class="text-sm font-mono font-medium px-2 py-1 rounded"
+                                  style="color: ${textColor}; background: rgba(0,0,0,0.2); backdrop-filter: blur(4px);">
+                                ${color.hex}
+                            </span>
+                            
+                            <!-- Remove button -->
+                            <button class="btn btn-destructive btn-sm absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                                    style="width: 1.5rem; height: 1.5rem; padding: 0;"
+                                    onclick="event.stopPropagation(); removeColor('${color.id}')">
+                                <svg class="icon" style="width: 0.75rem; height: 0.75rem;" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path d="M18 6 6 18M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Color info -->
+                        <div class="p-3 bg-card">
+                            <div class="flex items-center justify-between">
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium">${color.name}</p>
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <span class="badge badge-secondary text-xs">
+                                            Contrast vs White: ${contrastRatio.toFixed(1)}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `
+                    </div>
+
+                    <!-- Palette Summary -->
+                    <div class="bg-muted rounded-lg p-4">
+                        <h4 class="text-sm font-medium mb-2">Palette Summary</h4>
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <span class="text-muted-foreground">Colors:</span>
+                                <span class="ml-2 font-medium">${palette.length}</span>
+                            </div>
+                            <div>
+                                <span class="text-muted-foreground">Accessibility:</span>
+                                <span class="badge badge-secondary ml-2 text-xs">
+                                    ${palette.filter(color => getContrastRatio(color.hex, '#ffffff') >= 4.5).length} AA compliant
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function selectColor(hex) {
+            selectedColor = hex;
+            renderAll();
+        }
+
+        function removeColor(id) {
+            palette = palette.filter(color => color.id !== id);
+            renderAll();
+        }
+
+        // Recommendations
+        function renderRecommendations() {
+            const container = document.getElementById('recommendations');
+            
+            const recommendations = generateRecommendations();
+            
+            if (recommendations.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-4 text-muted-foreground">
+                        <svg class="icon-lg mx-auto mb-2 opacity-50" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="m9 12 2 2 4-4"/>
+                            <path d="M21 12c.552 0 1-.45 1-1s-.448-1-1-1"/>
+                            <path d="M3 12c-.552 0-1-.45-1-1s.448-1 1-1"/>
+                            <path d="m9 3.3-7 3.9c-.6.3-.6 1.1 0 1.4l7 3.9c.5.3 1.1.3 1.6 0l7-3.9c.6-.3.6-1.1 0-1.4L10.6 3.3c-.5-.3-1.1-.3-1.6 0z"/>
+                        </svg>
+                        <p class="text-sm">Select a color to see recommendations</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `
+                <div class="space-y-4">
+                    <!-- Header -->
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <svg class="icon text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="m9 12 2 2 4-4"/>
+                                <path d="M21 12c.552 0 1-.45 1-1s-.448-1-1-1"/>
+                                <path d="M3 12c-.552 0-1-.45-1-1s.448-1 1-1"/>
+                                <path d="m9 3.3-7 3.9c-.6.3-.6 1.1 0 1.4l7 3.9c.5.3 1.1.3 1.6 0l7-3.9c.6-.3.6-1.1 0-1.4L10.6 3.3c-.5-.3-1.1-.3-1.6 0z"/>
+                            </svg>
+                            <span class="text-sm font-medium">Smart Suggestions</span>
+                        </div>
+                        <button onclick="renderRecommendations()" class="btn btn-ghost btn-sm" style="height: 2rem; padding: 0 0.5rem;">
+                            <svg class="icon" style="width: 0.75rem; height: 0.75rem;" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Recommendations Grid -->
+                    <div class="grid grid-cols-2 gap-2">
+            `;
+
+            recommendations.forEach((rec, index) => {
+                html += `
+                    <div class="group relative border rounded-lg overflow-hidden hover:shadow-soft transition-all duration-200">
+                        <!-- Color Display -->
+                        <div class="h-16 relative cursor-pointer" style="background-color: ${rec.color}"
+                             onclick="addRecommendedColor('${rec.color}')">
+                            <div class="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-black/10"></div>
+                            
+                            <!-- Add Button -->
+                            <button class="btn btn-primary btn-sm absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                                    style="width: 1.5rem; height: 1.5rem; padding: 0;"
+                                    onclick="event.stopPropagation(); addRecommendedColor('${rec.color}')">
+                                <svg class="icon" style="width: 0.75rem; height: 0.75rem;" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <path d="M8 12h8m-4-4v8"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Info -->
+                        <div class="p-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-mono">${rec.color}</span>
+                            </div>
+                            <div class="mt-1">
+                                <span class="badge ${getTypeColor(rec.type)} text-xs">${rec.type}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `
+                    </div>
+
+                    <!-- Color Theory Info -->
+                    <div class="bg-muted rounded-lg p-3">
+                        <h5 class="text-xs font-medium mb-2">Color Theory Guide</h5>
+                        <div class="text-xs text-muted-foreground space-y-1">
+                            <div><strong>Complementary:</strong> Opposite on color wheel, high contrast</div>
+                            <div><strong>Triadic:</strong> Three colors evenly spaced, vibrant</div>
+                            <div><strong>Analogous:</strong> Adjacent colors, harmonious</div>
+                            <div><strong>Split Complementary:</strong> Softer than complementary</div>
+                            <div><strong>Monochromatic:</strong> Same hue, different shades</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function generateRecommendations() {
+            try {
+                const base = chroma(selectedColor);
+                const recommendations = [];
+
+                // Complementary color
+                const complementary = base.set('hsl.h', (base.get('hsl.h') + 180) % 360);
+                recommendations.push({
+                    color: complementary.hex(),
+                    type: 'Complementary',
+                    name: 'Complementary'
+                });
+
+                // Triadic colors
+                const triadic1 = base.set('hsl.h', (base.get('hsl.h') + 120) % 360);
+                const triadic2 = base.set('hsl.h', (base.get('hsl.h') + 240) % 360);
+                recommendations.push(
+                    { color: triadic1.hex(), type: 'Triadic', name: 'Triadic 1' },
+                    { color: triadic2.hex(), type: 'Triadic', name: 'Triadic 2' }
+                );
+
+                // Analogous colors
+                const analogous1 = base.set('hsl.h', (base.get('hsl.h') + 30) % 360);
+                const analogous2 = base.set('hsl.h', (base.get('hsl.h') - 30 + 360) % 360);
+                recommendations.push(
+                    { color: analogous1.hex(), type: 'Analogous', name: 'Analogous 1' },
+                    { color: analogous2.hex(), type: 'Analogous', name: 'Analogous 2' }
+                );
+
+                // Split complementary
+                const splitComp1 = base.set('hsl.h', (base.get('hsl.h') + 150) % 360);
+                const splitComp2 = base.set('hsl.h', (base.get('hsl.h') + 210) % 360);
+                recommendations.push(
+                    { color: splitComp1.hex(), type: 'Split Complementary', name: 'Split Comp 1' },
+                    { color: splitComp2.hex(), type: 'Split Complementary', name: 'Split Comp 2' }
+                );
+
+                // Monochromatic variations
+                const lighter = base.brighten(1);
+                const darker = base.darken(1);
+                
+                recommendations.push(
+                    { color: lighter.hex(), type: 'Monochromatic', name: 'Lighter' },
+                    { color: darker.hex(), type: 'Monochromatic', name: 'Darker' }
+                );
+
+                // Filter out colors already in palette
+                const currentColors = palette.map(c => c.hex.toLowerCase());
+                const filteredRecommendations = recommendations.filter(
+                    rec => !currentColors.includes(rec.color.toLowerCase())
+                );
+
+                return filteredRecommendations.slice(0, 8);
+            } catch (error) {
+                console.error('Error generating recommendations:', error);
+                return [];
+            }
+        }
+
+        function getTypeColor(type) {
+            switch (type) {
+                case 'Complementary': return 'badge-accent';
+                case 'Triadic': return 'badge-primary';
+                case 'Analogous': return 'badge-secondary';
+                case 'Split Complementary': return 'badge-warning';
+                case 'Monochromatic': return 'badge-muted';
+                default: return 'badge-secondary';
+            }
+        }
+
+        function addRecommendedColor(color) {
+            const newColor = {
+                id: Date.now().toString(),
+                hex: color,
+                name: `Recommended ${palette.length + 1}`
+            };
+            palette.push(newColor);
+            renderAll();
+        }
+
+        // Live Preview
+        function renderLivePreview() {
+            const container = document.getElementById('live-preview');
+            
+            if (palette.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-muted-foreground">
+                        <p>Add colors to your palette to see the live preview</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const simulatedPalette = palette.map(color => ({
+                ...color,
+                hex: simulateColorBlindness(color.hex, colorBlindnessType)
+            }));
+
+            const primary = simulatedPalette[0]?.hex || '#6366f1';
+            const secondary = simulatedPalette[1]?.hex || '#8b5cf6';
+            const accent = simulatedPalette[2]?.hex || '#06b6d4';
+
+            let html = `
+                <div class="space-y-6">
+                    <!-- Simulation Type Indicator -->
+                    ${colorBlindnessType !== 'none' ? `
+                        <div class="text-xs text-muted-foreground text-center p-2 bg-muted rounded">
+                            Viewing with ${colorBlindnessType} simulation
+                        </div>
+                    ` : ''}
+
+                    <!-- Color Swatches -->
+                    <div>
+                        <h4 class="text-sm font-medium mb-2">Color Swatches</h4>
+                        <div class="grid grid-cols-3 gap-2">
+            `;
+
+            simulatedPalette.forEach(color => {
+                html += `
+                    <div class="text-center">
+                        <div class="w-full h-12 rounded border" style="background-color: ${color.hex}"></div>
+                        <p class="text-xs mt-1 font-mono">${color.hex}</p>
+                        <p class="text-xs text-muted-foreground">${color.name}</p>
+                    </div>
+                `;
+            });
+
+            html += `
+                        </div>
+                    </div>
+
+                    <!-- UI Elements Preview -->
+                    <div class="space-y-4">
+                        <h4 class="text-sm font-medium">UI Elements</h4>
+                        
+                        <!-- Buttons -->
+                        <div class="space-y-3">
+                            <div class="flex gap-2 flex-wrap">
+                                <button class="px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                                        style="background-color: ${primary}; color: ${getTextColor(primary)}">
+                                    Primary Button
+                                </button>
+                                <button class="px-4 py-2 rounded-md text-sm font-medium border transition-colors"
+                                        style="border-color: ${primary}; color: ${primary}; background-color: transparent">
+                                    Secondary Button
+                                </button>
+                                <button class="px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                                        style="background-color: ${accent}; color: ${getTextColor(accent)}">
+                                    Accent Button
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Card Example -->
+                        <div class="border rounded-lg p-4 bg-card">
+                            <div class="flex items-start justify-between mb-3">
+                                <div>
+                                    <h3 class="font-semibold">Product Card</h3>
+                                    <p class="text-sm text-muted-foreground">Sample product description</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center gap-2 mb-3">
+                                <span style="color: ${accent}">★★★★☆</span>
+                                <span class="text-sm text-muted-foreground">(24 reviews)</span>
+                            </div>
+
+                            <div class="flex items-center justify-between">
+                                <span class="text-lg font-bold" style="color: ${primary}">$99.99</span>
+                                <button class="px-3 py-2 rounded text-sm font-medium"
+                                        style="background-color: ${primary}; color: ${getTextColor(primary)}">
+                                    Add to Cart
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Navigation Example -->
+                        <div class="border rounded-lg p-4 bg-card">
+                            <nav class="flex items-center justify-between">
+                                <div class="font-semibold" style="color: ${primary}">Brand Logo</div>
+                                <div class="flex items-center gap-4">
+                                    <a href="#" class="text-sm hover:text-primary">Home</a>
+                                    <a href="#" class="text-sm hover:text-primary">Products</a>
+                                    <a href="#" class="text-sm hover:text-primary">About</a>
+                                    <button class="px-3 py-1 rounded text-sm"
+                                            style="background-color: ${secondary}; color: ${getTextColor(secondary)}">
+                                        Login
+                                    </button>
+                                </div>
+                            </nav>
+                        </div>
+
+                        <!-- Badges -->
+                        <div class="space-y-2">
+                            <h5 class="text-sm font-medium">Status Badges</h5>
+                            <div class="flex gap-2 flex-wrap">
+                                <span class="px-2 py-1 rounded-full text-xs font-medium"
+                                      style="background-color: ${primary}20; color: ${primary}">
+                                    Primary
+                                </span>
+                                <span class="px-2 py-1 rounded-full text-xs font-medium"
+                                      style="background-color: ${secondary}20; color: ${secondary}">
+                                    Secondary
+                                </span>
+                                <span class="px-2 py-1 rounded-full text-xs font-medium"
+                                      style="background-color: ${accent}20; color: ${accent}">
+                                    Accent
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        // Export functionality
+        function exportPalette() {
+            const paletteData = {
+                name: 'Color Palette',
+                colors: palette,
+                exportedAt: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(paletteData, null, 2)], {
+                type: 'application/json'
+            });
+            
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'color-palette.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Render all components
+        function renderAll() {
+            renderColorPicker();
+            renderPaletteBuilder();
+            renderRecommendations();
+            renderLivePreview();
+            
+            if (currentTab === 'wcag') {
+                renderWCAGChecker();
+            } else {
+                renderColorBlindnessSimulator();
+            }
+        }
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            renderAll();
+        });
+    </script>
+</body>
+</html>
